@@ -25,6 +25,7 @@ export default function HeroesPage() {
         setHeroes(response.data);
         setLoading(false);
       } catch (err) {
+        console.error("Failed to fetch heroes:", err);
         setError("Failed to fetch heroes");
         setLoading(false);
       }

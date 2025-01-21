@@ -15,6 +15,7 @@ export async function GET() {
 
     return NextResponse.json(matches);
   } catch (error) {
+    console.error("Error fetching matches:", error); // Tambahkan logging
     return NextResponse.json(
       { error: "Error fetching matches" },
       { status: 500 }
@@ -45,10 +46,10 @@ export async function POST(request: Request) {
         enemyGold,
         description,
         teamHeroes: {
-          connect: teamHeroIds.map((id: string) => ({ id })),
+          connect: teamHeroIds.map((id: string) => ({ id })), // Pastikan id adalah string
         },
         enemyHeroes: {
-          connect: enemyHeroIds.map((id: string) => ({ id })),
+          connect: enemyHeroIds.map((id: string) => ({ id })), // Pastikan id adalah string
         },
       },
       include: {
@@ -59,7 +60,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json(match);
   } catch (error) {
-    console.error("Error creating match:", error);
+    console.error("Error creating match:", error); // Tambahkan logging
     return NextResponse.json(
       { error: "Error creating match" },
       { status: 500 }

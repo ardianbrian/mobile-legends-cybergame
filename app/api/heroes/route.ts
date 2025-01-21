@@ -11,6 +11,7 @@ export async function GET() {
 
     return NextResponse.json(heroes);
   } catch (error) {
+    console.error("Error fetching heroes:", error); // Logging error
     return NextResponse.json(
       { error: "Error fetching heroes" },
       { status: 500 }
@@ -32,6 +33,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json(hero);
   } catch (error) {
+    console.error("Error creating hero:", error); // Logging error
     return NextResponse.json({ error: "Error creating hero" }, { status: 500 });
   }
 }

@@ -23,6 +23,7 @@ export default function AddHeroPage() {
       await axios.post("/api/heroes", { name, category });
       router.push("/heroes"); // Redirect to heroes list
     } catch (err) {
+      console.error("Error adding hero:", err); // Log error ke console
       setError("Failed to add hero. Please try again.");
     } finally {
       setLoading(false);
@@ -63,7 +64,7 @@ export default function AddHeroPage() {
             <select
               id="category"
               value={category}
-              onChange={(e) => setCategory(e.target.value as any)}
+              onChange={(e) => setCategory(e.target.value as typeof category)}
               className="w-full p-2 rounded-lg bg-gray-700 text-white"
             >
               <option value="MARKSMAN">Marksman</option>
