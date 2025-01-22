@@ -3,9 +3,9 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import axios from "axios";
-import Loading from "./loading";
+import { useRouter } from "next/navigation";
+import LoadingMain from "./loading";
 
-// Definisikan tipe untuk Hero
 interface Hero {
   id: string;
   name: string;
@@ -17,12 +17,29 @@ export default function HeroesPage() {
   const [heroes, setHeroes] = useState<Hero[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortOption, setSortOption] = useState<"name" | "category" | null>(
+    null
+  );
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
+  const router = useRouter();
 
   useEffect(() => {
     const fetchHeroes = async () => {
       try {
-        const response = await axios.get("/api/heroes");
-        setHeroes(response.data);
+        const response = await axios.get("/api/heroes", {
+          params: {
+            page: currentPage,
+            limit: 20,
+            searchQuery,
+            sortOption,
+          },
+        });
+
+        setHeroes(response.data.data);
+        setTotalPages(response.data.meta.totalPages);
         setLoading(false);
       } catch (err) {
         console.error("Failed to fetch heroes:", err);
@@ -32,19 +49,39 @@ export default function HeroesPage() {
     };
 
     fetchHeroes();
-  }, []);
+  }, [currentPage, searchQuery, sortOption]);
 
-  const handleDelete = async (id: string) => {
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  // Fungsi untuk menghapus hero
+  const handleDelete = async (heroId: string) => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this hero?"
+    );
+
+    if (!confirmDelete) return;
+
     try {
-      await axios.delete(`/api/heroes/${id}`);
-      setHeroes((prev) => prev.filter((hero) => hero.id !== id));
+      // Hapus hero dari backend
+      await axios.delete(`/api/heroes/${heroId}`);
+
+      // Menampilkan alert berhasil
+      alert("Hero deleted successfully!");
+
+      // Refresh daftar hero setelah penghapusan
+      setHeroes((prevHeroes) =>
+        prevHeroes.filter((hero) => hero.id !== heroId)
+      );
     } catch (err) {
       console.error("Failed to delete hero:", err);
+      alert("Failed to delete hero.");
     }
   };
 
   if (loading) {
-    return <Loading />;
+    return <LoadingMain />;
   }
 
   if (error) {
@@ -60,7 +97,7 @@ export default function HeroesPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 p-8">
       <div className="max-w-6xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
+        <div className="flex justify-between items-center mb-4">
           <h1 className="text-3xl font-bold text-yellow-500">Heroes List</h1>
           <Link
             href="/"
@@ -70,7 +107,25 @@ export default function HeroesPage() {
           </Link>
         </div>
 
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex flex-wrap items-center gap-4 mb-6">
+          <input
+            type="text"
+            placeholder="Search heroes..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="p-2 rounded-lg bg-gray-700 text-white w-full md:w-1/3"
+          />
+          <select
+            value={sortOption || ""}
+            onChange={(e) =>
+              setSortOption(e.target.value as "name" | "category" | null)
+            }
+            className="p-2 rounded-lg bg-gray-700 text-white w-full md:w-1/3"
+          >
+            <option value="">Sort By</option>
+            <option value="name">Name</option>
+            <option value="category">Category</option>
+          </select>
           <Link
             href="/heroes/add"
             className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg transition"
@@ -79,8 +134,8 @@ export default function HeroesPage() {
           </Link>
         </div>
 
-        <div className="bg-gray-800 rounded-lg shadow-xl overflow-hidden">
-          <table className="w-full">
+        <div className="bg-gray-800 rounded-lg shadow-xl overflow-x-auto">
+          <table className="min-w-full">
             <thead>
               <tr className="bg-gray-700">
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
@@ -127,7 +182,7 @@ export default function HeroesPage() {
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                     <div className="flex gap-2">
                       <button
-                        onClick={() => alert(`Edit Hero: ${hero.name}`)}
+                        onClick={() => router.push(`/heroes/${hero.id}/edit`)}
                         className="bg-yellow-500 hover:bg-yellow-400 text-white px-3 py-1 rounded-lg transition"
                       >
                         Edit
@@ -146,10 +201,22 @@ export default function HeroesPage() {
           </table>
         </div>
 
+        <div className="flex justify-center gap-4 mt-4">
+          {[...Array(totalPages)].map((_, index) => (
+            <button
+              key={index}
+              onClick={() => handlePageChange(index + 1)}
+              className={`px-4 py-2 rounded-lg ${
+                currentPage === index + 1 ? "bg-blue-500" : "bg-gray-700"
+              }`}
+            >
+              {index + 1}
+            </button>
+          ))}
+        </div>
+
         {heroes.length === 0 && (
-          <div className="text-center py-8 text-gray-400">
-            No heroes found. Add some heroes to get started.
-          </div>
+          <div className="text-center py-4 text-gray-300">No heroes found</div>
         )}
       </div>
     </div>
@@ -157,13 +224,18 @@ export default function HeroesPage() {
 }
 
 function getCategoryColor(category: string) {
-  const colors = {
-    MARKSMAN: "bg-blue-500 text-white",
-    TANK: "bg-green-500 text-white",
-    FIGHTER: "bg-red-500 text-white",
-    ASSASSIN: "bg-purple-500 text-white",
-    MAGE: "bg-yellow-500 text-black",
-    SUPPORT: "bg-pink-500 text-white",
-  };
-  return colors[category as keyof typeof colors] || "bg-gray-500 text-white";
+  switch (category) {
+    case "TANK":
+      return "bg-gray-600";
+    case "FIGHTER":
+      return "bg-red-600";
+    case "ASSASSIN":
+      return "bg-purple-600";
+    case "MAGE":
+      return "bg-blue-600";
+    case "SUPPORT":
+      return "bg-green-600";
+    default:
+      return "bg-yellow-600";
+  }
 }
