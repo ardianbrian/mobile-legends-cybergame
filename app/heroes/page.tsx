@@ -148,9 +148,6 @@ export default function HeroesPage() {
                   Category
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                  Created At
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
@@ -177,9 +174,6 @@ export default function HeroesPage() {
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                    {new Date(hero.createdAt).toLocaleDateString()}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                     <div className="flex gap-2">
                       <button
                         onClick={() => router.push(`/heroes/${hero.id}/edit`)}
@@ -201,18 +195,32 @@ export default function HeroesPage() {
           </table>
         </div>
 
-        <div className="flex justify-center gap-4 mt-4">
-          {[...Array(totalPages)].map((_, index) => (
-            <button
-              key={index}
-              onClick={() => handlePageChange(index + 1)}
-              className={`px-4 py-2 rounded-lg ${
-                currentPage === index + 1 ? "bg-blue-500" : "bg-gray-700"
-              }`}
-            >
-              {index + 1}
-            </button>
-          ))}
+        <div className="flex flex-wrap justify-center gap-2 mt-4">
+          <button
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+            className={`px-4 py-2 rounded-lg ${
+              currentPage === 1
+                ? "bg-gray-500 cursor-not-allowed"
+                : "bg-gray-700"
+            }`}
+          >
+            &lt;
+          </button>
+          <span className="px-4 py-2 bg-gray-700 text-white rounded-lg">
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className={`px-4 py-2 rounded-lg ${
+              currentPage === totalPages
+                ? "bg-gray-500 cursor-not-allowed"
+                : "bg-gray-700"
+            }`}
+          >
+            &gt;
+          </button>
         </div>
 
         {heroes.length === 0 && (

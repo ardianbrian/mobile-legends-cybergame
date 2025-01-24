@@ -29,13 +29,21 @@ model Hero {
   @@map("heroes")
 }
 
+enum MatchStatus {
+  VICTORY
+  DEFEAT
+  DRAW
+}
+
 model Match {
   id          String    @id @default(uuid())
+  title       String    @map("title")
   matchTime   DateTime  @map("match_time")
   teamScore   Int       @map("team_score")
   enemyScore  Int       @map("enemy_score")
   teamGold    Int       @map("team_gold")
   enemyGold   Int       @map("enemy_gold")
+  status      MatchStatus  @default(DRAW) @map("status")
   description String?
   createdAt   DateTime  @default(now()) @map("created_at")
   
