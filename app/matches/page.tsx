@@ -25,7 +25,7 @@ export default function MatchesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [sortOption, setSortOption] = useState<"title" | "matchTime" | null>(
+  const [sortOption, setSortOption] = useState<"title" | "createdAt" | null>(
     null
   );
   const [currentPage, setCurrentPage] = useState(1);
@@ -126,13 +126,13 @@ export default function MatchesPage() {
           <select
             value={sortOption || ""}
             onChange={(e) =>
-              setSortOption(e.target.value as "title" | "matchTime" | null)
+              setSortOption(e.target.value as "title" | "createdAt" | null)
             }
             className="p-3 rounded-lg bg-gray-700 text-white flex-grow"
           >
             <option value="">Sort By</option>
             <option value="title">Title</option>
-            <option value="matchTime">Match Time</option>
+            <option value="createdAt">Created At</option>
           </select>
 
           <Link
@@ -155,7 +155,7 @@ export default function MatchesPage() {
                     {match.title}
                   </h2>
                   <p className="text-sm text-gray-400">
-                    {new Date(match.matchTime).toLocaleString()}
+                    {new Date(match.createdAt).toLocaleString()}
                   </p>
                 </div>
                 <div className="flex space-x-2">
@@ -171,6 +171,13 @@ export default function MatchesPage() {
                   >
                     <Trash2 size={20} />
                   </button>
+                  {/* Link to match detail page */}
+                  <Link
+                    href={`/matches/${match.id}/detail`}
+                    className="text-blue-500 hover:text-blue-400 transition"
+                  >
+                    View Details
+                  </Link>
                 </div>
               </div>
 

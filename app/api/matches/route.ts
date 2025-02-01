@@ -46,7 +46,7 @@ export async function POST(request: Request) {
     const body = await request.json();
     const {
       title,
-      matchTime,
+      durationMinutes,
       teamScore,
       enemyScore,
       teamGold,
@@ -59,7 +59,7 @@ export async function POST(request: Request) {
 
     const match = await prisma.match.create({
       data: {
-        matchTime: new Date(matchTime),
+        durationMinutes,
         title,
         teamScore,
         enemyScore,

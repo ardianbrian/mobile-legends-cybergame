@@ -13,6 +13,9 @@ export async function GET(request: Request) {
           mode: "insensitive",
         },
       },
+      orderBy: {
+        name: "asc", // Mengurutkan dari A-Z
+      },
       select: {
         id: true,
         name: true,

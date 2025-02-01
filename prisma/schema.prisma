@@ -38,7 +38,7 @@ enum MatchStatus {
 model Match {
   id          String    @id @default(uuid())
   title       String    @map("title")
-  matchTime   DateTime  @map("match_time")
+  durationMinutes Int   @map("duration_minutes") @default(10)
   teamScore   Int       @map("team_score")
   enemyScore  Int       @map("enemy_score")
   teamGold    Int       @map("team_gold")
