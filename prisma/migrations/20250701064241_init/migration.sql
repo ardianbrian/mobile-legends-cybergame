@@ -1,6 +1,9 @@
 -- CreateEnum
 CREATE TYPE "HeroCategory" AS ENUM ('MARKSMAN', 'TANK', 'FIGHTER', 'ASSASSIN', 'MAGE', 'SUPPORT');
 
+-- CreateEnum
+CREATE TYPE "MatchStatus" AS ENUM ('VICTORY', 'DEFEAT', 'DRAW');
+
 -- CreateTable
 CREATE TABLE "heroes" (
     "id" TEXT NOT NULL,
@@ -14,11 +17,13 @@ CREATE TABLE "heroes" (
 -- CreateTable
 CREATE TABLE "matches" (
     "id" TEXT NOT NULL,
-    "match_time" TIMESTAMP(3) NOT NULL,
+    "title" TEXT NOT NULL,
+    "duration_minutes" INTEGER NOT NULL DEFAULT 10,
     "team_score" INTEGER NOT NULL,
     "enemy_score" INTEGER NOT NULL,
     "team_gold" INTEGER NOT NULL,
     "enemy_gold" INTEGER NOT NULL,
+    "status" "MatchStatus" NOT NULL DEFAULT 'DRAW',
     "description" TEXT,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
